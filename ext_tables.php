@@ -8,7 +8,7 @@ call_user_func(
         if (TYPO3_MODE == 'BE') {
             TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(
                 'web_func',
-                \MichielRoos\WizardCrpagetree\CreatePageTree::class,
+                \MichielRoos\WizardCrpagetree\WebFunction\CreatePageTree::class,
                 null,
                 'LLL:EXT:wizard_crpagetree/Resources/Private/Language/locallang.xml:wiz_crPageTree'
             );
