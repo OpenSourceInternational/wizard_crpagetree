@@ -1,3 +1,6 @@
+2018-12-24  Lex Frolenko
+- [TASK] TYPO3 9.5 compatibility
+
 2015-11-11  Michiel Roos <michiel@maxserv.com>
 - [TASK] TYPO3 7.6 compatibility
 

@@ -24,12 +24,14 @@ namespace MichielRoos\WizardCrpagetree;
  */
 use TYPO3\CMS\Backend\Tree\View\BrowseTreeView;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
 use TYPO3\CMS\Frontend\Page\PageRepository;
+use TYPO3\CMS\Core\Localization\LanguageService;
+use TYPO3\CMS\Core\Type\Bitmask\Permission;
+use TYPO3\CMS\Backend\Template\DocumentTemplate;
 
 /**
  * Creates the "Create pagetree" wizard
@@ -38,8 +40,36 @@ use TYPO3\CMS\Frontend\Page\PageRepository;
  * @package TYPO3
  * @subpackage tx_wizardcrpagetree
  */
-class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
+class CreatePageTree
 {
+
+    /**
+     * The integer value of the GET/POST var, 'id'. Used for submodules to the 'Web' module (page id)
+     *
+     * @see init()
+     * @var int
+     */
+    public $id;
+
+
+    /**
+     * @var \TYPO3\CMS\Backend\Template\DocumentTemplate
+     */
+    public $documentTemplate;
+
+    /**
+     * Initialize the object
+     *
+     * @param \object $pObj A reference to the parent (calling) object
+     * @throws \RuntimeException
+     * @see \TYPO3\CMS\Backend\Module\BaseScriptClass::checkExtObj()
+     */
+    public function init($pObj)
+    {
+        $this->id = (int)GeneralUtility::_GP('id');
+        $this->documentTemplate = GeneralUtility::makeInstance(DocumentTemplate::class);
+    }
+
     /**
      * Main function creating the content for the module.
      *
@@ -50,9 +80,9 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
         $theCode = '';
         $pageTree = array();
         // create new pages here?
-        $pRec = BackendUtility::getRecord('pages', $this->pObj->id, 'uid, title', ' AND ' . $GLOBALS['BE_USER']->getPagePermsClause(8));
+        $pRec = BackendUtility::getRecord('pages', $this->id, 'uid, title', ' AND ' . $GLOBALS['BE_USER']->getPagePermsClause(8));
         $sysPages = GeneralUtility::makeInstance(PageRepository::class);
-        $menuItems = $sysPages->getMenu($this->pObj->id);
+        $menuItems = $sysPages->getMenu($this->id);
         if (is_array($pRec)) {
             if (GeneralUtility::_POST('newPageTree') === 'submit') {
                 $data = explode("\r\n", GeneralUtility::_POST('data'));
@@ -62,11 +92,11 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
                         $endI = end($menuItems);
                         $thePid = -intval($endI['uid']);
                         if (!$thePid) {
-                            $thePid = $this->pObj->id;
+                            $thePid = $this->id;
                         }
                     } else {
                         // get parent pid
-                        $thePid = $this->pObj->id;
+                        $thePid = $this->id;
                     }
 
                     $ic = $this->getIndentationChar();
@@ -85,7 +115,7 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
                         $oldLevel = 0;
                         $parentPid = array();
                         $currentPid = 0;
-                        while (list($k, $line) = each($data)) {
+                        foreach ($data as $k => $line) {
                             if (trim($line)) {
                                 // What level are we on?
                                 preg_match('/^' . $ic . '*/', $line, $regs);
@@ -147,20 +177,12 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
                     $tree->ext_IconMode = true;
                     $tree->expandAll = true;
 
-                    if (version_compare(TYPO3_branch, '6.2', '>')) {
-                        $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
-                        $tree->tree[] = array(
-                            'row' => $pRec,
-                            'HTML' => $iconFactory->getIconForRecord('pages', array($thePid), Icon::SIZE_SMALL)->render()
-                        );
-                    }
-                    if (version_compare(TYPO3_branch, '6.2', '=')) {
-                        $tree->setTreeName('pageTree');
-                        $tree->tree[] = array(
-                            'row' => $pRec,
-                            'HTML' => IconUtility::getSpriteIconForRecord('pages', $pRec)
-                        );
-                    }
+                    $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
+                    $tree->tree[] = array(
+                        'row' => $pRec,
+                        'HTML' => $iconFactory->getIconForRecord('pages', array($thePid), Icon::SIZE_SMALL)->render()
+                    );
+
                     $tree->getTree($thePid);
 
                     $theCode .= $this->getLanguageLabel('wiz_newPageTree_created');
@@ -175,8 +197,7 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
 
         // Context Sensitive Help
         $theCode .= BackendUtility::cshItem('_MOD_web_func', 'tx_wizardcrpagetree', $GLOBALS['BACK_PATH'], '<br/>|');
-
-        return $this->pObj->doc->section($this->getLanguageLabel('wiz_crMany'), $theCode, 0, 1);
+        return $this->documentTemplate->render($this->getLanguageLabel('wiz_crMany'), $theCode);
     }
 
     /**
@@ -328,37 +349,50 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
     /**
      * Return html to display the creation form
      *
-     * @return   array      the data reversed
+     * @return string
      */
     private function displayCreatForm()
-    {
-        $form = '<b>' . $this->getLanguageLabel('wiz_newPageTree') . ':</b><p>' . $this->getLanguageLabel('wiz_newPageTree_howto') . '</p>
-		' . $this->getLanguageLabel('wiz_newPageTree_indentationCharacter') . '
-		<select name="indentationCharacter">
-			<option value="space" selected="selected">' . $this->getLanguageLabel('wiz_newPageTree_indentationSpace') . '</option>
-			<option value="tab">' . $this->getLanguageLabel('wiz_newPageTree_indentationTab') . '</option>
-			<option value="dot">' . $this->getLanguageLabel('wiz_newPageTree_indentationDot') . '</option>
-		</select><br/>
-		<textarea name="data"' . $this->pObj->doc->formWidth(35) . ' rows="8"/></textarea>
-		<br />
-		<br />
-		<input type="checkbox" name="createInListEnd" value="1" /> ' . $this->getLanguageLabel('wiz_newPageTree_listEnd') . '<br />
-		<input type="checkbox" name="hidePages" value="1" /> ' . $this->getLanguageLabel('wiz_newPageTree_hidePages') . '<br />
-		<input type="submit" name="create" value="' . $this->getLanguageLabel('wiz_newPageTree_lCreate') . '" onclick="return confirm(' . GeneralUtility::quoteJSvalue($this->getLanguageLabel('wiz_newPageTree_lCreate_msg1')) . ')"> <input type="reset" value="' . $this->getLanguageLabel('wiz_newPageTree_lReset') . '" />
-		<br />
-		<br />
-		<b>' . $this->getLanguageLabel('wiz_newPageTree_advanced') . '</b><br/>
-		' . $this->getLanguageLabel('wiz_newPageTree_extraFields') . '<br />
-		<input type="text" name="extraFields" size="30" /><br />
-		' . $this->getLanguageLabel('wiz_newPageTree_separationCharacter') . '
-		<select name="separationCharacter">
-			<option value="comma" selected="selected">' . $this->getLanguageLabel('wiz_newPageTree_separationComma') . '</option>
-			<option value="pipe">' . $this->getLanguageLabel('wiz_newPageTree_separationPipe') . '</option>
-			<option value="semicolon">' . $this->getLanguageLabel('wiz_newPageTree_separationSemicolon') . '</option>
-			<option value="colon">' . $this->getLanguageLabel('wiz_newPageTree_separationColon') . '</option>
-		</select><br/>
-		<br/>
-		<input type="hidden" name="newPageTree" value="submit"/>';
+    {   $form = '
+        <div class="module">
+            <h1>' . $this->getLanguageLabel('wiz_newPageTree') . ':</h1>
+            <p>' . $this->getLanguageLabel('wiz_newPageTree_howto') . '</p>
+            <div class="form-group">
+                <label for="indentationCharacter">' . $this->getLanguageLabel('wiz_newPageTree_indentationCharacter') . '</label>
+                <select id="indentationCharacter" class="form-control" name="indentationCharacter">
+                    <option value="space" selected="selected">' . $this->getLanguageLabel('wiz_newPageTree_indentationSpace') . '</option>
+                    <option value="tab">' . $this->getLanguageLabel('wiz_newPageTree_indentationTab') . '</option>
+                    <option value="dot">' . $this->getLanguageLabel('wiz_newPageTree_indentationDot') . '</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <textarea class="form-control" name="data"rows="8"/></textarea>
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="createInListEnd" value="1" /> ' . $this->getLanguageLabel('wiz_newPageTree_listEnd') . '
+            </div>
+            <div class="form-group">
+                <input type="checkbox" name="hidePages" value="1" /> ' . $this->getLanguageLabel('wiz_newPageTree_hidePages') . '
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-default" name="create" value="' . $this->getLanguageLabel('wiz_newPageTree_lCreate') . '" onclick="return confirm(' . GeneralUtility::quoteJSvalue($this->getLanguageLabel('wiz_newPageTree_lCreate_msg1')) . ')">
+                <input type="reset" class="btn btn-default" value="' . $this->getLanguageLabel('wiz_newPageTree_lReset') . '" />
+            </div>
+            <h3>' . $this->getLanguageLabel('wiz_newPageTree_advanced') . '</h3>
+            <div class="form-group">
+                <label for="extraFields">' . $this->getLanguageLabel('wiz_newPageTree_extraFields') . '</label>
+                <input type="text" id="extraFields" class="form-control" name="extraFields" size="30" />
+            </div>
+            <div class="form-group">
+                <label for="separationCharacter">' . $this->getLanguageLabel('wiz_newPageTree_separationCharacter') . '</label>
+                <select name="separationCharacter" id="separationCharacter" class="form-control">
+                    <option value="comma" selected="selected">' . $this->getLanguageLabel('wiz_newPageTree_separationComma') . '</option>
+                    <option value="pipe">' . $this->getLanguageLabel('wiz_newPageTree_separationPipe') . '</option>
+                    <option value="semicolon">' . $this->getLanguageLabel('wiz_newPageTree_separationSemicolon') . '</option>
+                    <option value="colon">' . $this->getLanguageLabel('wiz_newPageTree_separationColon') . '</option>
+                </select>
+            </div>
+		    <input type="hidden" name="newPageTree" value="submit"/> 
+		</div>';
 
         return $form;
     }
@@ -417,7 +451,7 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
     /**
      * Get the extra fields
      *
-     * @return   array      the extra fields
+     * @return array|bool
      */
     private function getExtraFields()
     {
@@ -448,6 +482,19 @@ class CreatePageTree extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule
      */
     public function helpBubble()
     {
-        return '<img src="' . $GLOBALS['BACK_PATH'] . 'gfx/helpbubble.gif" width="14" height="14" hspace="2" align="top"' . $this->pObj->doc->helpStyle() . ' alt="" />';
+        return '<img src="' . $GLOBALS['BACK_PATH'] . 'gfx/helpbubble.gif" width="14" height="14" hspace="2" align="top"' . $this->documentTemplate->helpStyle() . ' alt="" />';
+    }
+
+    /**
+     * Creates an instance of the class found in $this->extClassConf['name'] in $this->extObj if any (this should hold three keys, "name", "path" and "title" if a "Function menu module" tries to connect...)
+     * This value in extClassConf might be set by an extension (in an ext_tables/ext_localconf file) which thus "connects" to a module.
+     * The array $this->extClassConf is set in handleExternalFunctionValue() based on the value of MOD_SETTINGS[function]
+     * If an instance is created it is initiated with $this passed as value and $this->extClassConf as second argument. Further the $this->MOD_SETTING is cleaned up again after calling the init function.
+     *
+     * @see handleExternalFunctionValue(), \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(), $extObj
+     */
+    public function checkExtObj()
+    {
+        // not required for this function
     }
 }
