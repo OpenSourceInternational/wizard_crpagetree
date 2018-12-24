@@ -1,0 +1,34 @@
+{
+  "name": "michielroos/wizard_crpagetree",
+  "type": "typo3-cms-extension",
+  "description": "Wizard that will create a page tree for you. Feed it with a space indented tree structure of the desired pages and the pages will be created for you.",
+  "keywords": [
+    "TYPO3",
+    "wizard",
+    "pagetree",
+    "tree",
+    "generate"
+  ],
+  "homepage": "https://github.com/Tuurlijk/TYPO3-Extension-WizardCrPagetree",
+  "authors": [
+    {
+      "name": "Michiel Roos",
+      "email": "michiel@maxserv.com",
+      "role": "Developer",
+      "homepage": "http://www.michielroos.com"
+    }
+  ],
+  "license": "GPL-2.0+",
+  "require": {
+    "typo3/cms-core": "^9.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "MichielRoos\\WizardCrpagetree\\": "Classes"
+    }
+  },
+  "replace": {
+    "wizard_crpagetree": "self.version",
+    "typo3-ter/wizard_crpagetree": "self.version"
+  }
+}
