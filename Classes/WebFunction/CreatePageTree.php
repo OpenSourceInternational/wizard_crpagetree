@@ -138,7 +138,7 @@ class CreatePageTree
                         'HTML' => $iconFactory->getIconForRecord('pages', [$thePid], Icon::SIZE_SMALL)->render()
                     ];
 
-                    $tree->getTree($thePid);
+                    $tree->getTree($this->id);
 
                     $theCode .= LanguageUtility::getLanguageLabel('wiz_newPageTree_created');
                     $theCode .= $tree->printTree();
