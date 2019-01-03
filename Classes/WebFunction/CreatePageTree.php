@@ -131,6 +131,7 @@ class CreatePageTree
                     $tree->thisScript = 'index.php';
                     $tree->ext_IconMode = true;
                     $tree->expandAll = true;
+                    $tree->clause .= ' OR hidden = 1 ';
 
                     $iconFactory = GeneralUtility::makeInstance(IconFactory::class);
                     $tree->tree[] = [
