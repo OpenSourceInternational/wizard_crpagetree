@@ -1,31 +1,21 @@
-# TYPO3 Extension "wizard_crpagetree"
+Pagetree Wizard
+===============
+
 Wizard that will create a page tree for you. Feed it with a space indented tree structure of the desired pages and the pages will be created for you.
 
-## Version 1.0.2
+I made this extension because I found the create multiple pages wizard to be too limiting. We often run into people who have a complete sitemap available up front. It would be nice if this map could be imported into the page tree at once.
 
+You can feed the wizard a space, tab or dot-indented list of titles. It will then create a page tree based on this input.
 
+You can also specify additional fields on every line. This enables you to easily fill fields like subtitle or alias.
 
+C-style comments (single and multi line) as well as empty lines are ignored.
 
-<table>
-	<tr><td>Version</td><td>1.0.2 stable</td></tr>
-	<tr><td>Release date</td><td>14. March 2013</td></tr>
-	<tr><td>Author</td><td>Michiel Roos</td></tr>
-	<tr><td>Comment</td><td>- Refactor Language setup
-- Add ext_autoload.php
-- Move images into Resources folder
-- Move code into Classes directory
-- Fix deprectated function: getSetUpdatesignal - setUpdateSignal
-- Re-generate function index
-- Code cleanup</td></tr>
-</table>
+Issue tracker can be found here: [TYPO3 Forge Project Page][1]
 
-## !! Attention !!
-This is an **automatically** generated git version, based on the release into the [TYPO3 Extension Repository](http://www.typo3.org/extensions/).
-You can find the original version at http://typo3.org/extensions/repository/view/wizard_crpagetree/ .
+## Credits
 
-It does not make sense to make pull requests as this repository has been created automatically from 3rd party, not from the original author(s).
+You can say thanks at [@TuurlijkNiet][5]
 
-Every version of the extension is tagged with the version number, therefore you can switch quite easily between different versions.
-
-
--- never edit the line below (typo3-ter) --
+[1]: https://forge.typo3.org/projects/extension-wizard_crpagetree "TYPO3 Forge Project Page"
+[5]: https://twitter.com/TuurlijkNiet "Twitter"
