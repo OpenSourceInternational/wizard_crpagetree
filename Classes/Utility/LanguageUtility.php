@@ -1,4 +1,5 @@
 <?php
+
 namespace MichielRoos\WizardCrpagetree\Utility;
 
 /**

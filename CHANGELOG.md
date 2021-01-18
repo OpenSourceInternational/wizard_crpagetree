@@ -1,3 +1,6 @@
+2021-01-18  Vladimir Cherednichenko
+- [TASK] TYPO3 10.4 compatibility
+
 2018-12-24  Lex Frolenko
 - [TASK] TYPO3 9.5 compatibility
 - [BUGFIX] fixed pagetree parent for success page

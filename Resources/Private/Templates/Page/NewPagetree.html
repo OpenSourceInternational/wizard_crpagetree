@@ -1,0 +1,134 @@
+{namespace be = TYPO3\CMS\Backend\ViewHelpers}
+
+<h1>
+    <f:translate key="title" extensionName="wizard_crpagetree"/>
+</h1>
+
+<f:if condition="!{canCreateNew}">
+    <f:then>
+        <f:be.infobox
+            title="{f:translate(key:'canNotCreateNew.title', extensionName:'wizard_crpagetree')}"
+            message="{f:translate(key:'canNotCreateNew.message', extensionName:'wizard_crpagetree')}"
+            state="-1"
+        />
+    </f:then>
+    <f:else>
+        <f:if condition="{hasNewPagesData}">
+            <f:then>
+                <f:if condition="{pagesCreated}">
+                    <f:then>
+                        <f:be.infobox
+                            title="{f:translate(key:'pagesCreated.title', extensionName:'wizard_crpagetree')}"
+                            message="{f:translate(key:'pagesCreated.message', extensionName:'wizard_crpagetree')}"
+                            state="-1"
+                        />
+                        <f:format.html>{createdPages}</f:format.html>
+                    </f:then>
+                    <f:else>
+                        <f:be.infobox
+                            title="{f:translate(key:'noPagesCreated.title', extensionName:'wizard_crpagetree')}"
+                            message="{f:translate(key:'noPagesCreated.message', extensionName:'wizard_crpagetree')}"
+                            state="1"
+                        />
+                    </f:else>
+                </f:if>
+                <f:if condition="{visiblePages}">
+                    <div class="form-group">
+                        <h2>
+                            <f:translate key="newSubPages" extensionName="wizard_crpagetree"/>
+                        </h2>
+                        <f:for each="{visiblePages}" as="page">
+                            <core:iconForRecord table="pages" row="{page}" />
+                            {page.title -> f:format.crop(maxCharacters: maxTitleLength)}
+                            <br />
+                        </f:for>
+                    </div>
+                </f:if>
+            </f:then>
+            <f:else>
+                <form action="{be:moduleLink(route:'pagetree_new', arguments:'{id:pageUid}')}" method="post">
+                    <div class="form-group t3js-newpagetree-container">
+                        <div class="form-section">
+                            <div class="row">
+                                <div class="form-group col-xs-12">
+                                    <label for="page_new_0">
+                                        <f:translate key="indentationCharacter" extensionName="wizard_crpagetree" />
+                                    </label>
+                                    <div class="form-control-wrap">
+                                        <select name="indentationCharacter" class="form-control form-control-adapt">
+                                            <option value="space" selected="selected"><f:translate key="indentationSpace" extensionName="wizard_crpagetree" /></option>
+                                            <option value="tab"><f:translate key="indentationTab" extensionName="wizard_crpagetree" /></option>
+                                            <option value="dot"><f:translate key="indentationDot" extensionName="wizard_crpagetree" /></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-xs-12">
+                                    <label for="pageTree">
+                                        <f:translate key="howto" extensionName="wizard_crpagetree" />
+                                    </label>
+                                    <div class="form-control-wrap">
+                                        <textarea class="form-control" id="pageTree" name="pageTree" rows="8"/></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-xs-12">
+                                    <div class="checkbox">
+                                        <label for="listEnd"><input type="checkbox" name="createInListEnd" id="listEnd" value="1" />
+                                            <f:translate key="listEnd" extensionName="wizard_crpagetree" />
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label for="hidePages"><input type="checkbox" name="hidePages" id="hidePages" value="1" />
+                                            <f:translate key="hidePages" extensionName="wizard_crpagetree" />
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label for="hidePagesInMenus"><input type="checkbox" name="hidePagesInMenus" id="hidePagesInMenus" value="1" />
+                                            <f:translate key="hidePagesInMenus" extensionName="wizard_crpagetree" />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-xs-12">
+                                    <h4><f:translate key="advanced" extensionName="wizard_crpagetree" /></h4>
+                                </div>
+                                <div class="form-group col-xs-12">
+                                    <label for="extraFields"><f:translate key="extraFields" extensionName="wizard_crpagetree" /></label>
+                                    <input class="form-control" type="text" name="extraFields" size="30" id="extraFields"/>
+                                </div>
+                                <div class="form-group col-xs-12">
+                                    <label for="separationCharacter"><f:translate key="separationCharacter" extensionName="wizard_crpagetree" /></label>
+                                    <select name="separationCharacter" class="form-control form-control-adapt" id="separationCharacter">
+                                        <option value="comma" selected="selected"><f:translate key="separationComma" extensionName="wizard_crpagetree" /></option>
+                                        <option value="pipe"><f:translate key="separationPipe" extensionName="wizard_crpagetree" /></option>
+                                        <option value="semicolon"><f:translate key="separationSemicolon" extensionName="wizard_crpagetree" /></option>
+                                        <option value="colon"><f:translate key="separationColon" extensionName="wizard_crpagetree" /></option>
+                                    </select>
+                                </div>
+                                <input type="hidden" name="newPageTree" value="submit"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input
+                            class="btn btn-default"
+                            type="submit"
+                            name="create"
+                            value="{f:translate(key:'lCreate', extensionName:'wizard_crpagetree')}"
+                            onclick="return confirm({f:translate(key:'lCreate_msg1', extensionName:'wizard_crpagetree')})"
+                        />
+                        <input
+                            class="btn btn-default"
+                            type="reset"
+                            value="{f:translate(key:'lReset', extensionName:'wizard_crpagetree')}"
+                        />
+                    </div>
+                </form>
+            </f:else>
+        </f:if>
+    </f:else>
+</f:if>

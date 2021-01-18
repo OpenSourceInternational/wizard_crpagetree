@@ -11,7 +11,6 @@ use MichielRoos\WizardCrpagetree\Utility\LanguageUtility;
  */
 class DataHandlerService
 {
-
     /**
      * @var int
      */
@@ -46,6 +45,7 @@ class DataHandlerService
             $oldLevel = 0;
             $parentPid = [];
             $currentPid = 0;
+
             foreach ($data as $key => $line) {
                 if (trim($line)) {
                     // What level are we on?
@@ -95,7 +95,7 @@ class DataHandlerService
             $tce->process_datamap();
             BackendUtility::setUpdateSignal('updatePageTree');
         } else {
-            $result .= $GLOBALS['TBE_TEMPLATE']->rfw(LanguageUtility::getLanguageLabel('wiz_newPageTree_noCreate') . '<br /><br />');
+            $result .= '<span>' . LanguageUtility::getLanguageLabel('wiz_newPageTree_noCreate') . '</span><br /><br />';
         }
 
         return $result;

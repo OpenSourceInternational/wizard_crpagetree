@@ -1,4 +1,5 @@
 <?php
+
 namespace MichielRoos\WizardCrpagetree\Utility;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;

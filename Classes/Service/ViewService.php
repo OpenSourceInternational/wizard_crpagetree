@@ -3,6 +3,7 @@ namespace MichielRoos\WizardCrpagetree\Service;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use MichielRoos\WizardCrpagetree\Utility\LanguageUtility;
+
 /**
  * Class ViewService
  * @package MichielRoos\WizardCrpagetree\Utility

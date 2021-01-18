@@ -1,4 +1,5 @@
 <?php
+
 namespace MichielRoos\WizardCrpagetree\WebFunction;
 
 /**
@@ -22,14 +23,14 @@ namespace MichielRoos\WizardCrpagetree\WebFunction;
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  */
+
+use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Tree\View\BrowseTreeView;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Domain\Repository\PageRepository;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Imaging\IconFactory;
-use TYPO3\CMS\Frontend\Page\PageRepository;
-use TYPO3\CMS\Backend\Template\DocumentTemplate;
 use MichielRoos\WizardCrpagetree\Utility\DataConvertingUtility;
 use MichielRoos\WizardCrpagetree\Utility\LanguageUtility;
 use MichielRoos\WizardCrpagetree\Utility\RequestUtility;
@@ -54,17 +55,17 @@ class CreatePageTree
     public $id;
 
     /**
-     * @var \TYPO3\CMS\Backend\Template\DocumentTemplate
+     * @var ModuleTemplate
      */
-    public $documentTemplate;
+    public $moduleTemplate;
 
     /**
-     * @var \MichielRoos\WizardCrpagetree\Service\ViewService
+     * @var ViewService
      */
     public $viewService;
 
     /**
-     * @var \MichielRoos\WizardCrpagetree\Service\DataHandlerService
+     * @var DataHandlerService
      */
     public $dataHandlerService;
 
@@ -78,7 +79,7 @@ class CreatePageTree
     public function init($pObj)
     {
         $this->id = (int)GeneralUtility::_GP('id');
-        $this->documentTemplate = GeneralUtility::makeInstance(DocumentTemplate::class);
+        $this->moduleTemplate = GeneralUtility::makeInstance(ModuleTemplate::class);
         $this->viewService = GeneralUtility::makeInstance(ViewService::class);
         $this->dataHandlerService = GeneralUtility::makeInstance(DataHandlerService::class);
     }
@@ -95,6 +96,7 @@ class CreatePageTree
         $pRec = BackendUtility::getRecord('pages', $this->id, 'uid, title', ' AND ' . $GLOBALS['BE_USER']->getPagePermsClause(8));
         $sysPages = GeneralUtility::makeInstance(PageRepository::class);
         $menuItems = $sysPages->getMenu($this->id);
+
         if (is_array($pRec)) {
             if (GeneralUtility::_POST('newPageTree') === 'submit') {
                 $data = explode("\r\n", GeneralUtility::_POST('data'));
@@ -127,6 +129,8 @@ class CreatePageTree
                     // Display result:
                     /** @var BrowseTreeView $tree */
                     $tree = GeneralUtility::makeInstance(BrowseTreeView::class);
+
+                    /** @extensionScannerIgnoreLine */
                     $tree->init(' AND pages.doktype < 199 AND pages.hidden = "0"');
                     $tree->thisScript = 'index.php';
                     $tree->ext_IconMode = true;
@@ -148,24 +152,14 @@ class CreatePageTree
                 $theCode .= $this->viewService->displayCreatForm();
             }
         } else {
-            $theCode .= $GLOBALS['TBE_TEMPLATE']->rfw(LanguageUtility::getLanguageLabel('wiz_newPageTree_errorMsg1'));
+            $theCode .= '<span>' . LanguageUtility::getLanguageLabel('wiz_newPageTree_errorMsg1') . '</span>';
         }
 
         // Context Sensitive Help
         $theCode .= BackendUtility::cshItem('_MOD_web_func', 'tx_wizardcrpagetree', $GLOBALS['BACK_PATH'], '<br/>|');
-        return $this->documentTemplate->render(LanguageUtility::getLanguageLabel('wiz_crMany'), $theCode);
-    }
 
-    /**
-     * Creates an instance of the class found in $this->extClassConf['name'] in $this->extObj if any (this should hold three keys, "name", "path" and "title" if a "Function menu module" tries to connect...)
-     * This value in extClassConf might be set by an extension (in an ext_tables/ext_localconf file) which thus "connects" to a module.
-     * The array $this->extClassConf is set in handleExternalFunctionValue() based on the value of MOD_SETTINGS[function]
-     * If an instance is created it is initiated with $this passed as value and $this->extClassConf as second argument. Further the $this->MOD_SETTING is cleaned up again after calling the init function.
-     *
-     * @see handleExternalFunctionValue(), \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::insertModuleFunction(), $extObj
-     */
-    public function checkExtObj()
-    {
-        // not required for this function
+        $this->moduleTemplate->getView()->setTemplateSource($theCode);
+
+        return $this->moduleTemplate->renderContent();
     }
 }

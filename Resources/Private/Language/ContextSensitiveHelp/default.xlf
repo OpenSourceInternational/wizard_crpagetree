@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.0" xmlns="urn:oasis:names:tc:xliff:document:1.1">
+    <file source-language="en" datatype="plaintext"
+          original="EXT:wizard_crpagetree/Resources/Private/Language/ContextSensitiveHelp/default.xlf"
+          data="2019-05-07T18-05-38" product-name="wizard_crpagetree">
+        <header/>
+        <body>
+            <trans-unit id="tx_wizardcrpagetree.alttitle" resname="tx_wizardcrpagetree.alttitle">
+                <source>Create Page tree wizard</source>
+            </trans-unit>
+            <trans-unit id="tx_wizardcrpagetree.description" resname="tx_wizardcrpagetree.description" xml:space="preserve">
+               <source>Enables you to create a batch of new, empty pages for quickly building up a new page tree.
+                    Just enter the titles for the pages you need. Every indentation character stands for a level in the tree. C-style comments ('//', '#' and '/***/') and empty lines are ignored.</source>
+            </trans-unit>
+            <trans-unit id="tx_wizardcrpagetree.details" resname="tx_wizardcrpagetree.details" xml:space="preserve">
+                <source>The new pages will always be created as subpages of the currently active page in the page tree. This page is shown in the top of the page. In the example image below it is "/Intro/Startpage/".
+
+&lt;b&gt;"Place new pages after the existing subpages"&lt;/b&gt;
+If you select this option the pages will be create &lt;em&gt;after&lt;/em&gt; any existing subpages.
+
+&lt;b&gt;"Hide new pages"&lt;/b&gt;
+Select this if the new pages should be hidden by default. This option may be forced upon you if you do not have credentials to create new, online pages.
+
+&lt;b&gt;Advanced&lt;/b&gt;
+You may add additional field values (besides title) to the created pages. Specify the values after the title, separated by the 'field value separation character'. Then specify which fields the values should map to. In the example the extra fields 'description' and 'shortcut' are set for the created pages.</source>
+            </trans-unit>
+            <trans-unit id="_tx_wizardcrpagetree.image" resname="_tx_wizardcrpagetree.image" xml:space="preserve">
+                <source>EXT:wizard_crpagetree/Resources/Public/Images/crpagetree_1.png,
+EXT:wizard_crpagetree/Resources/Public/Images/crpagetree_2.png</source>
+            </trans-unit>
+            <trans-unit id="tx_wizardcrpagetree.image_descr" resname="tx_wizardcrpagetree.image_descr" xml:space="preserve">
+                <source>Simply enter a space delimited list of titles and generate an entire tree at once.
+After pressing the "Create page tree" button the page tree to the left will update instantly, showing you the position of the new pages!</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
